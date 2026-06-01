@@ -40,6 +40,8 @@ export function validate(doc) {
     need(typeof s.headline_plan === "string" && s.headline_plan.length > 0, "headline_plan is required");
     need(isPrice(s.monthly_usd), "monthly_usd must be a number or null");
     need(isPrice(s.annual_usd), "annual_usd must be a number or null");
+    need(typeof s.family_plan === "boolean", "family_plan must be boolean");
+    need(["yes", "no", "unclear"].includes(s.different_household), "different_household must be yes|no|unclear");
     need(isUrl(s.source_url), "source_url must be a valid URL");
     need(isIsoDate(s.last_verified), "last_verified must be an ISO date (YYYY-MM-DD)");
   });

@@ -17,6 +17,13 @@ function faviconUrl(serviceUrl) {
   } catch { return ""; }
 }
 
+// Three-state badge for the cross-household policy.
+function householdBadge(value) {
+  if (value === "yes") return `<span class="badge yes">Yes</span>`;
+  if (value === "no") return `<span class="badge no">No</span>`;
+  return `<span class="badge">Unclear</span>`;
+}
+
 function render() {
   const filtered = filterServices(state.services, { query: state.query, category: state.category });
   const sorted = sortServices(filtered, state.sort.column, state.sort.dir, state.mode);
@@ -32,6 +39,8 @@ function render() {
       <td>${s.headline_plan}</td>
       <td class="price">${formatPrice(price)}${save ? `<span class="save">save ${save}%</span>` : ""}</td>
       <td><span class="badge ${s.free_tier ? "yes" : ""}">${s.free_tier ? "Free tier" : "No"}</span></td>
+      <td><span class="badge ${s.family_plan ? "yes" : ""}">${s.family_plan ? "Yes" : "No"}</span></td>
+      <td>${householdBadge(s.different_household)}</td>
       <td><a href="${s.source_url}" target="_blank" rel="noopener">source ↗</a></td>`;
     rowsEl.appendChild(tr);
   }

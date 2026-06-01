@@ -14,6 +14,8 @@ function goodEntry(overrides = {}) {
     headline_plan: "Standard",
     monthly_usd: 17.99,
     annual_usd: null,
+    family_plan: false,
+    different_household: "no",
     source_url: "https://help.netflix.com/x",
     last_verified: "2026-06-01",
     ...overrides,
@@ -63,4 +65,21 @@ test("bad date is reported", () => {
 test("bad url is reported", () => {
   const errors = validate(goodDoc([goodEntry({ url: "not a url" })]));
   assert.ok(errors.some((m) => m.includes("url")));
+});
+
+test("family_plan must be boolean", () => {
+  const errors = validate(goodDoc([goodEntry({ family_plan: "yes" })]));
+  assert.ok(errors.some((m) => m.includes("family_plan")));
+});
+
+test("different_household must be yes|no|unclear", () => {
+  const errors = validate(goodDoc([goodEntry({ different_household: "maybe" })]));
+  assert.ok(errors.some((m) => m.includes("different_household")));
+});
+
+test("missing different_household is reported", () => {
+  const e = goodEntry();
+  delete e.different_household;
+  const errors = validate(goodDoc([e]));
+  assert.ok(errors.some((m) => m.includes("different_household")));
 });

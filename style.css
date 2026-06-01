@@ -50,8 +50,10 @@ table.pricing {
 .save { color: var(--good); font-size: .8rem; margin-left: .4rem; }
 .badge { display: inline-block; white-space: nowrap; font-size: .75rem; padding: .1rem .45rem; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
 .badge.yes { color: var(--good); border-color: var(--good); }
+.badge.no { color: #ff6b6b; border-color: #ff6b6b; }
 a { color: var(--accent); }
 .pricing td:last-child { white-space: nowrap; }
+.pricing th:nth-child(2), .pricing td:nth-child(2) { white-space: nowrap; }
 
 .site-footer { max-width: 1000px; margin: 0 auto; padding: 1.25rem; color: var(--muted); font-size: .9rem; }
 
