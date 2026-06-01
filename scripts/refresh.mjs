@@ -37,7 +37,7 @@ for (const s of doc.services) {
   try { r = await checkService(s); } catch (e) { console.error(`! ${s.id}: ${e.message}`); r = { verified: false }; }
   if (r && r.verified) {
     s.monthly_usd = r.monthly_usd ?? s.monthly_usd;
-    s.annual_usd = r.annual_usd ?? null;
+    s.annual_usd = r.annual_usd ?? s.annual_usd;
     if (r.source_url) s.source_url = r.source_url;
     s.last_verified = TODAY;
     updated++;
