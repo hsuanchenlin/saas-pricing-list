@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SaaS Pricing List — monthly & annual prices</title>
+    <meta name="description" content="A curated, regularly-updated list of SaaS service prices (USD), monthly and annual." />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1>SaaS Pricing List</h1>
+      <p class="tagline">Monthly &amp; annual prices for popular services, in USD.</p>
+    </header>
+
+    <section class="controls" aria-label="Filters">
+      <input id="search" type="search" placeholder="Search services…" autocomplete="off" />
+      <select id="category" aria-label="Filter by category">
+        <option value="">All categories</option>
+      </select>
+      <div class="toggle" role="group" aria-label="Billing period">
+        <button id="toggle-monthly" class="active" data-mode="monthly">Monthly</button>
+        <button id="toggle-annual" data-mode="annual">Annual</button>
+      </div>
+    </section>
+
+    <p id="status" class="status" role="status"></p>
+
+    <table id="table" class="pricing">
+      <thead>
+        <tr>
+          <th data-column="name" class="sortable" aria-sort="none">Service</th>
+          <th data-column="category" class="sortable" aria-sort="none">Category</th>
+          <th>Plan</th>
+          <th data-column="price" class="sortable" aria-sort="none">Price</th>
+          <th>Free tier</th>
+          <th>Source</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+
+    <footer class="site-footer">
+      <p id="updated"></p>
+      <p>Prices in USD. Always verify on the provider's own site before subscribing.</p>
+    </footer>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
