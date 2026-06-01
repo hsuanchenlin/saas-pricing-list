@@ -19,8 +19,13 @@ jobs:
         with: { node-version: 20 }
       - run: npm run validate
       - run: node --test
+      - name: Stage static site
+        run: |
+          mkdir -p _site/data
+          cp index.html style.css app.js lib.mjs categories.mjs _site/
+          cp data/services.json _site/data/
       - uses: actions/upload-pages-artifact@v3
-        with: { path: "." }
+        with: { path: "_site" }
   deploy:
     needs: build
     runs-on: ubuntu-latest
