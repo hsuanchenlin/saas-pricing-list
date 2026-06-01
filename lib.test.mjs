@@ -60,4 +60,6 @@ test("sortServices by name and by price", () => {
   assert.deepEqual(sortServices(list, "name", "desc", "monthly").map(s => s.id), ["c", "b", "a"]);
   // price asc, custom (Infinity) sorts last regardless of direction nulls? -> last on asc
   assert.deepEqual(sortServices(list, "price", "asc", "annual").map(s => s.id), ["b", "a", "c"]);
+  // price desc: null-price (Custom) must still sort LAST, not first
+  assert.deepEqual(sortServices(list, "price", "desc", "annual").map(s => s.id), ["a", "b", "c"]);
 });

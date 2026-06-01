@@ -48,6 +48,10 @@ export function sortServices(services, column, dir, mode) {
     if (column === "price") {
       av = priceSortValue(a, mode);
       bv = priceSortValue(b, mode);
+      // Missing prices (Infinity) always sort last, regardless of direction.
+      if (av === Infinity && bv === Infinity) return 0;
+      if (av === Infinity) return 1;
+      if (bv === Infinity) return -1;
     } else {
       av = String(a[column] ?? "").toLowerCase();
       bv = String(b[column] ?? "").toLowerCase();
