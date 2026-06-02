@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Subscriptions — SaaS Pricing List</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1>My Subscriptions</h1>
+      <p class="tagline"><a href="index.html">← Back to the catalog</a></p>
+    </header>
+
+    <!-- Signed-out view -->
+    <section id="signed-out" class="controls" aria-label="Sign in" hidden>
+      <form id="signin-form" class="controls" style="margin:0;padding:0">
+        <input id="signin-email" type="email" required placeholder="you@example.com" autocomplete="email" />
+        <button type="submit">Send me a sign-in link</button>
+      </form>
+      <p id="auth-msg" class="status"></p>
+    </section>
+
+    <!-- Signed-in view -->
+    <section id="signed-in" hidden>
+      <div class="controls">
+        <span id="who" class="status"></span>
+        <button id="signout">Sign out</button>
+      </div>
+
+      <form id="add-form" class="controls" aria-label="Add subscription">
+        <input id="f-service" list="service-list" placeholder="Service" required />
+        <datalist id="service-list"></datalist>
+        <label>Start <input id="f-start" type="date" required /></label>
+        <label>Renews <input id="f-end" type="date" required /></label>
+        <label>Remind <input id="f-days" type="number" min="0" max="90" value="3" style="width:4rem" /> days before</label>
+        <button type="submit">Add</button>
+      </form>
+      <p id="add-msg" class="status"></p>
+
+      <table id="subs-table" class="pricing">
+        <thead>
+          <tr><th>Service</th><th>Start</th><th>Renews</th><th>Reminder</th><th>Days left</th><th></th></tr>
+        </thead>
+        <tbody id="subs-rows"></tbody>
+      </table>
+    </section>
+
+    <script type="module" src="js/tracker-main.js"></script>
+  </body>
+</html>
