@@ -26,14 +26,18 @@ monthly⇄annual toggle all run client-side.
 ## Subscription tracker
 
 `tracker.html` lets signed-in users record subscriptions and get an email before each
-renewal. Backend: Supabase (magic-link auth + Postgres + RLS); reminder cron + email:
+renewal. Backend: Supabase (GitHub OAuth + Postgres + RLS); reminder cron + email:
 a Vercel serverless function (`api/send-reminders.ts`) on a daily schedule via Resend.
 
 ### Setup
-1. Supabase: apply `supabase/migrations/0001_subscriptions.sql` in the SQL Editor; set
-   Auth redirect URLs to the Vercel domain + `http://localhost:3000`.
-2. Resend: verify a sender; get `RESEND_API_KEY`.
-3. Vercel: import the repo; set env vars `SUPABASE_URL`, `SUPABASE_SECRET_KEY`,
+1. GitHub OAuth App (GitHub → Settings → Developer settings → OAuth Apps → New):
+   Homepage `https://<your-app>.vercel.app`, Authorization callback URL
+   `https://<project-ref>.supabase.co/auth/v1/callback`. Note the Client ID + Secret.
+2. Supabase: apply `supabase/migrations/0001_subscriptions.sql` in the SQL Editor;
+   Authentication → Providers → enable GitHub with that Client ID + Secret; set Auth
+   redirect URLs to the Vercel domain + `http://localhost:3000`.
+3. Resend: verify a sender; get `RESEND_API_KEY`.
+4. Vercel: import the repo; set env vars `SUPABASE_URL`, `SUPABASE_SECRET_KEY`,
    `RESEND_API_KEY`, `REMINDER_FROM`, `CRON_SECRET`.
 
 ### Local dev

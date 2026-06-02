@@ -1,23 +1,19 @@
-// js/auth.js — magic-link sign in/out and session-state wiring.
+// js/auth.js — GitHub OAuth sign in/out and session-state wiring.
 import { supabase } from "./supabase-client.js";
 
-// Wires the auth form and reports session changes via callbacks.
+// Wires the GitHub sign-in button and reports session changes via callbacks.
 export function initAuth({ onSignedIn, onSignedOut }) {
-  const form = document.querySelector("#signin-form");
-  const emailInput = document.querySelector("#signin-email");
+  const githubBtn = document.querySelector("#signin-github");
   const msg = document.querySelector("#auth-msg");
   const signoutBtn = document.querySelector("#signout");
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    msg.textContent = "Sending…";
-    const { error } = await supabase.auth.signInWithOtp({
-      email: emailInput.value.trim(),
-      options: { emailRedirectTo: window.location.href },
+  githubBtn.addEventListener("click", async () => {
+    msg.textContent = "Redirecting to GitHub…";
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "github",
+      options: { redirectTo: window.location.href },
     });
-    msg.textContent = error
-      ? `Error: ${error.message}`
-      : "Check your email for a sign-in link.";
+    if (error) msg.textContent = `Error: ${error.message}`;
   });
 
   signoutBtn.addEventListener("click", () => supabase.auth.signOut());

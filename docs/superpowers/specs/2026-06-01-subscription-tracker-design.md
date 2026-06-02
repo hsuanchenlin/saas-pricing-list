@@ -12,14 +12,14 @@ cancel in time. The public catalog is unchanged.
 
 This introduces a backend, which the current pure-static site does not have. We use
 **Vercel** (hosting + serverless functions + cron) paired with **Supabase**
-(magic-link auth + Postgres + row-level security) and **Resend** (email).
+(GitHub OAuth + Postgres + row-level security) and **Resend** (email).
 
 ## Decisions (locked)
 
 | Decision | Choice |
 |----------|--------|
 | Hosting / DX | Vercel (auto-deploys the repo; replaces the GitHub Pages workflow) |
-| Auth | Supabase magic link (passwordless email) |
+| Auth | Supabase GitHub OAuth |
 | Database | Supabase Postgres with row-level security |
 | Reminder scheduler | Vercel Cron → serverless TypeScript function (daily) |
 | Reminder model | Lead-time before `end_date` (e.g. 3 days), one reminder per subscription |
@@ -40,7 +40,7 @@ This introduces a backend, which the current pure-static site does not have. We 
 ```
 Vercel                                          Supabase (managed)
 ├── index.html  (public catalog, unchanged)
-├── tracker.html + js/  (supabase-js, publishable key) ──▶ Auth (magic link)
+├── tracker.html + js/  (supabase-js, publishable key) ──▶ Auth (GitHub OAuth)
 │                                                      └─▶ Postgres: subscriptions + RLS
 ├── api/send-reminders.ts  (serverless TS) ──────────────▶ Postgres (via secret key)
 └── vercel.json: cron daily ──▶ /api/send-reminders ─────▶ Resend (emails)
@@ -59,7 +59,7 @@ lib/reminders.mjs                # isReminderDue() + date validation; shared by 
 lib/reminders.test.mjs           # unit tests (node --test)
 tracker.html                     # logged-in tracker page
 js/supabase-client.js            # init supabase-js (URL + publishable key)
-js/auth.js                       # magic-link sign in/out + session UI
+js/auth.js                       # GitHub OAuth sign in/out + session UI
 js/subscriptions.js              # CRUD + render table/form; service picker from data/services.json
 supabase/migrations/0001_subscriptions.sql   # table + RLS policies + index
 ```
@@ -96,22 +96,26 @@ Index: `(reminded_at, end_date)` to make the daily "due" query cheap.
 The reminder function uses the **secret key**, which bypasses RLS, so it can read due
 rows across all users.
 
-## Auth flow (magic link)
+## Auth flow (GitHub OAuth)
 
-1. On `tracker.html`, signed-out users enter their email and request a link
-   (`supabase.auth.signInWithOtp({ email, options: { emailRedirectTo } })`).
-2. Supabase emails a one-time sign-in link; clicking it returns to the app and
-   supabase-js establishes a session (persisted in `localStorage`).
+1. On `tracker.html`, signed-out users click "Sign in with GitHub"
+   (`supabase.auth.signInWithOAuth({ provider: "github", options: { redirectTo } })`).
+2. They authorize on GitHub → Supabase's `/auth/v1/callback` → back to `redirectTo` (the
+   tracker page); supabase-js establishes a session (persisted in `localStorage`). No
+   email is sent, so there is no email rate limit.
 3. `supabase.auth.onAuthStateChange` drives UI: signed-out view vs. tracker view.
 4. Sign-out calls `supabase.auth.signOut()`.
 
-Dashboard config required: Authentication → URL Configuration → **Site URL** and
-**Redirect URLs** must include the Vercel domain and `http://localhost:3000` for dev.
-Optionally point Supabase Auth SMTP at Resend to avoid the default email rate limit.
+Setup required:
+- A **GitHub OAuth App** (Homepage = the Vercel domain; Authorization callback URL =
+  `https://<project-ref>.supabase.co/auth/v1/callback`) → Client ID + Secret.
+- Supabase → Authentication → **Providers → GitHub**: enable, paste the Client ID + Secret.
+- Supabase → Authentication → URL Configuration: **Site URL** + **Redirect URLs** include
+  the Vercel domain and `http://localhost:3000` for dev.
 
 ## Tracker UI (`tracker.html` + `js/`)
 
-- **Signed out:** email input + "Send me a sign-in link"; shows confirmation after send.
+- **Signed out:** a "Sign in with GitHub" button; redirects to GitHub to authorize.
 - **Signed in:** a table of the user's subscriptions — service, start date, renewal
   date, "reminds N days before", and computed "days until renewal" (red when within the
   reminder window). An **Add** form with: service picker (a `<datalist>`/select sourced
@@ -170,7 +174,7 @@ Pure, dependency-free, unit-tested functions used by both the function and the U
 - **Unit (node --test):** `lib/reminders.mjs` — `isReminderDue` (boundary cases: exactly
   at window start, at end_date, already reminded, outside window), `daysUntil`, and
   `validateSubscriptionInput` (each failure mode). This is the logic most prone to bugs.
-- **Integration (manual / Supabase local `supabase start`):** the magic-link round trip
+- **Integration (manual / Supabase local `supabase start`):** the GitHub OAuth round trip
   and RLS isolation — verify user A cannot read or modify user B's rows. Honest caveat:
   auth and RLS cannot be meaningfully unit-tested without a real Supabase instance.
 - The reminder function is exercised by invoking it locally (`vercel dev`) with the cron
@@ -178,7 +182,7 @@ Pure, dependency-free, unit-tested functions used by both the function and the U
 
 ## Build order
 
-- **Phase A — Auth + CRUD:** Supabase migration, `supabase-client.js`, magic-link
+- **Phase A — Auth + CRUD:** Supabase migration, `supabase-client.js`, GitHub OAuth
   sign-in/out, `tracker.html`, subscription create/list/edit/delete with RLS, the shared
   `lib/reminders.mjs` (so the UI can show "days until"). Independently shippable: a user
   can log in and manage subscriptions, just without emails yet.

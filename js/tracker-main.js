@@ -22,7 +22,7 @@ async function refresh() {
 function showSignedIn(user) {
   signedOut.hidden = true;
   signedIn.hidden = false;
-  who.textContent = `Signed in as ${user.email}`;
+  who.textContent = `Signed in as ${user.email || user.user_metadata?.user_name || "you"}`;
   refresh();
 }
 function showSignedOut() {
