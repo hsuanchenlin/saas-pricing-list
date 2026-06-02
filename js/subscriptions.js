@@ -61,12 +61,13 @@ export function renderRows(tbody, rows) {
     const soon = d !== null && d >= 0 && d <= r.reminder_days;
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${r.service_name}</td>
+      <td class="svc-name"></td>
       <td>${r.start_date}</td>
       <td>${r.end_date}</td>
       <td>${r.reminder_days}d before</td>
       <td class="${soon ? "due" : ""}">${d === null ? "—" : d + " days"}</td>
       <td><button class="del" data-id="${r.id}">Delete</button></td>`;
+    tr.querySelector(".svc-name").textContent = r.service_name;
     tbody.appendChild(tr);
   }
 }
