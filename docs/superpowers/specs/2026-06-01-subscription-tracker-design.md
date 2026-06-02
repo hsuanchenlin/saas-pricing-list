@@ -117,7 +117,8 @@ Optionally point Supabase Auth SMTP at Resend to avoid the default email rate li
   reminder window). An **Add** form with: service picker (a `<datalist>`/select sourced
   from `data/services.json`, which prefills `service_id` + `service_name` and can show
   the catalog price as a hint, e.g. "≈ $19.99/mo"), start date, end date, reminder days.
-  Each row has edit and delete.
+  Each row has a delete action. (Per-row editing is out of scope for v1 — delete and
+  re-add instead.)
 - Client-side validation before insert/update (see shared logic). Network/auth errors
   surface as inline messages.
 
@@ -195,6 +196,7 @@ Pure, dependency-free, unit-tested functions used by both the function and the U
 
 ## Out of scope (v1)
 
+- Per-row editing of a subscription (delete + re-add instead).
 - Recurring auto-roll of renewal dates (one reminder per subscription only).
 - Editing/cancelling the actual subscription at the provider (we only remind).
 - Price-change tracking, spend analytics, shared/household accounts.
